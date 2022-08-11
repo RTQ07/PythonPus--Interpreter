@@ -118,7 +118,7 @@ def interpret(dictionary):
         elif type(item) == int or float:
           integer_stack.insert(0,item)
         
-        if limit == 98:
+        if limit == 101:
           break
 
     elif key == "float":
