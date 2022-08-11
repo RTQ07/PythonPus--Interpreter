@@ -1,0 +1,133 @@
+exec_list = []
+integer_stack = []
+string_stack = []
+boolean_stack = []
+
+def deep_copy(content):
+    if not isinstance(content,list):
+        return content
+    else:
+        holder = []
+        for argument in content:
+            holder.append(deep_copy(argument))
+        return holder
+
+def integer_add(): ### This funtion add the two numbers popped from the list
+  total = 0
+  if len(integer_stack) >=2:
+    arguments = [integer_stack.pop(0) for idx in range(2)]
+    total+=sum(arguments)
+    return integer_stack.insert(0,total)
+  else:
+    return None
+
+def integer_mult():### This funtion multiplies the two numbers popped from the list
+  total =1
+  if len(integer_stack) >=2:
+    arguments = [integer_stack.pop(0) for idx in range(2)]
+    for i in arguments:
+      total *= i
+    return integer_stack.insert(0,total)
+  else:
+    return None
+
+
+def integer_sub(): ### This funtion substracts the two numbers popped from the list
+  total =0
+  if len(integer_stack) >=2:
+    arguments = [integer_stack.pop(0) for idx in range(2)]
+    total = arguments[1] - arguments[0]
+    return integer_stack.insert(0,total)
+  else:
+    return None
+    
+
+def boolean_or(): ## This function compare two boolean values
+  if len(boolean_stack) >= 2:
+    arguments = [boolean_stack.pop(0) for idx in range(2)]
+    return boolean_stack.insert(0,arguments[1] or arguments[0])
+  elif len(boolean_stack) == 1:
+    argum = [boolean_stack.pop(0) for idx in range(1)]
+    return boolean_stack.insert(0,argum)
+
+
+def boolean_not(): ## This function negates any boolean value 
+  if len(boolean_stack)>=1:
+    arg = boolean_stack.pop(0)
+    return boolean_stack.insert(0,not arg)
+
+
+def integer_lte(): ## Returns True if first number is greater or equal to the second
+  if len(integer_stack) >=2:
+    arguments = [integer_stack.pop(0) for idx in range(2)]
+    if arguments[1] <= arguments[0]:
+      return boolean_stack.insert(0,True)
+    else:
+      return boolean_stack.insert(0,False)
+  else:
+    return None
+
+
+
+def exec_dup(): ## This funtions returns a duplicate of a the element infront
+    #argument = exec_list[0].copy()
+    argument = deep_copy(exec_list[0])
+    return exec_list.insert(0,argument)
+
+
+
+
+
+command_list = [integer_add,integer_mult,integer_sub,boolean_or, boolean_not,
+              integer_lte, exec_dup]
+
+
+
+def interpret(dictionary):
+  limit = 0
+  
+  for key in dictionary: ### Traversing through to find the "exec" key.
+
+    if key == "exec":
+      while dictionary[key]:
+        item = dictionary[key].pop(0)
+        exec_list.append(item)
+
+      while exec_list:
+        item = exec_list.pop(0)
+        limit += 1
+
+        if type(item) == list:
+          while item:
+            new_item = item.pop()
+            
+            exec_list.insert(0,new_item)
+          continue
+          
+      
+        elif item in command_list:
+          item()
+          
+
+        elif type(item) == bool:
+          boolean_stack.insert(0,item)
+
+        elif type(item) == str:
+          string_stack.insert(0,item)
+
+        elif type(item) == int or float:
+          integer_stack.insert(0,item)
+        
+        if limit == 98:
+          break
+
+    elif key == "float":
+      dictionary[key] = [float (i) for i in integer_stack]
+
+    elif key == "string":
+      dictionary[key] = string_stack
+    
+    elif key == 'boolean':
+      dictionary[key] = boolean_stack
+
+  return dictionary
