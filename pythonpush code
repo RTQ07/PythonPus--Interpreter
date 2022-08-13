@@ -1,3 +1,4 @@
+
 exec_list = []
 integer_stack = []
 string_stack = []
@@ -84,7 +85,7 @@ command_list = [integer_add,integer_mult,integer_sub,boolean_or, boolean_not,
 
 
 def interpret(dictionary):
-  limit = 0
+ 
   
   for key in dictionary: ### Traversing through to find the "exec" key.
 
@@ -93,9 +94,11 @@ def interpret(dictionary):
         item = dictionary[key].pop(0)
         exec_list.append(item)
 
+      limit = 0
       while exec_list:
-        item = exec_list.pop(0)
         limit += 1
+        item = exec_list.pop(0)
+        
 
         if type(item) == list:
           while item:
@@ -104,11 +107,13 @@ def interpret(dictionary):
             exec_list.insert(0,new_item)
           continue
           
-      
+        if limit == 100:
+          break
+          
         elif item in command_list:
           item()
           
-
+        
         elif type(item) == bool:
           boolean_stack.insert(0,item)
 
@@ -118,9 +123,8 @@ def interpret(dictionary):
         elif type(item) == int or float:
           integer_stack.insert(0,item)
         
-        if limit == 101:
-          break
-
+        
+   
     elif key == "float":
       dictionary[key] = [float (i) for i in integer_stack]
 
